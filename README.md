@@ -204,3 +204,68 @@ Open http://localhost:3000 and sign up. You'll receive an OTP via email (or chec
 
 > [!TIP]
 > See `sagent/.env.example` and `web/.env.example` for full documentation with comments.
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              User Browser                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Frontend (Next.js + CopilotKit)                                            │
+│  ├── Chat UI with streaming responses                                       │
+│  ├── Better Auth (sessions, teams)                                          │
+│  └── /api/copilotkit → AG-UI bridge                                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │ AG-UI Protocol
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  Backend (FastAPI + ADK)                                                    │
+│  ├── Root Agent (Gemini 2.5 Pro + extended thinking)                        │
+│  │   ├── Team Knowledge Agent → Vertex AI RAG                               │
+│  │   ├── Web Search Agent → Google Search                                   │
+│  │   └── File Tools → Artifact storage                                      │
+│  └── Callbacks: user context injection, artifact injection                  │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                    ┌─────────────────┼─────────────────┐
+                    ▼                 ▼                 ▼
+              ┌──────────┐     ┌──────────┐     ┌──────────┐
+              │ Postgres │     │ Vertex   │     │   GCS    │
+              │ Sessions │     │ AI RAG   │     │ Artifacts│
+              │ Auth     │     │ Engine   │     │          │
+              └──────────┘     └──────────┘     └──────────┘
+```
+
+### Data Flow
+
+1. **User sends message** → CopilotKit streams to `/api/copilotkit` with `x-user-id` header
+2. **AG-UI bridge** → Forwards to ADK backend via `HttpAgent`
+3. **Context injection** → User's teams and accessible RAG corpora loaded into state
+4. **Agent execution** → Root agent delegates to sub-agents (RAG, web search, files)
+5. **Response synthesis** → Gemini combines sources with inline citations
+6. **Streaming response** → Flows back through AG-UI to CopilotKit UI
+
+### Project Structure
+
+```
+sagent/                          # Backend (ADK + FastAPI)
+├── agents/
+│   ├── root.py                 # Main orchestrator
+│   ├── search.py               # Web search sub-agent
+│   └── rag/agent.py            # Team knowledge sub-agent
+├── callbacks/                  # Before/after LLM hooks
+├── tools/                      # File operations
+└── main.py                     # FastAPI server
+
+web/                             # Frontend (Next.js + CopilotKit)
+├── src/app/
+│   ├── api/copilotkit/         # AG-UI bridge
+│   ├── api/sessions/           # Session management
+│   └── chat/                   # Chat pages
+└── src/components/
+    └── copilotkit-provider.tsx # Auth header injection
+```
+
