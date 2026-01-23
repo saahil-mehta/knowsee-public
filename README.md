@@ -171,3 +171,36 @@ This automatically:
 ### 5. Create an Account
 
 Open http://localhost:3000 and sign up. You'll receive an OTP via email (or check Mailgun logs in sandbox mode).
+
+## Configuration
+
+### Backend (`sagent/.env.development`)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `GOOGLE_CLOUD_PROJECT` | Yes | GCP project ID for Vertex AI |
+| `GOOGLE_CLOUD_LOCATION` | Yes | GCP region (default: `europe-west1`) |
+| `GOOGLE_GENAI_USE_VERTEXAI` | Yes | `TRUE` for Vertex AI (recommended) or use API key |
+
+> [!NOTE]
+> This project uses Vertex AI for production parity — RAG Engine, Cloud SQL, and other GCP services require it. You can switch to a Gemini API key for simpler local testing.
+| `DATABASE_URL` | Yes | Postgres connection string |
+| `ENVIRONMENT` | No | `development` (default) or `production` |
+| `RAG_SIMILARITY_TOP_K` | No | RAG retrieval count (default: `10`) |
+| `TEAM_MEMBERSHIP_PROVIDER` | No | `better_auth`, `google_groups`, or `azure_ad` |
+
+### Frontend (`web/.env.development`)
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `AGENT_URL` | Yes | Backend URL (default: `http://localhost:8000`) |
+| `NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY` | Yes | CopilotKit public key |
+| `BETTER_AUTH_URL` | Yes | Auth callback URL (default: `http://localhost:3000`) |
+| `BETTER_AUTH_SECRET` | Yes | Session encryption key |
+| `DATABASE_URL` | Yes | Postgres connection string |
+| `MAILGUN_API_KEY` | No | Mailgun API key (optional) |
+| `MAILGUN_DOMAIN` | No | Mailgun sending domain |
+| `MAILGUN_FROM` | No | From address for emails |
+
+> [!TIP]
+> See `sagent/.env.example` and `web/.env.example` for full documentation with comments.
