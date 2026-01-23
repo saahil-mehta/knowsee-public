@@ -82,7 +82,7 @@ export function SourcesPill({ className }: SourcesPillProps) {
         )}
       >
         <div className="px-2.5 py-2 text-xs font-medium tracking-wide text-muted-foreground/70">
-          Knowledge Bases
+          RAG Knowledge Bases
         </div>
         {teams.map((team) => (
           <DropdownMenuItem key={team.teamId} asChild>
