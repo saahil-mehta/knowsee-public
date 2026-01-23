@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/links-line-dark.png" alt="Knowsee Icon" height="40" />
+<img src="assets/links-line-dark.png" alt="Knowsee Icon" height="50" align="middle" />
 &nbsp;&nbsp;
-<img src="assets/knowsee.png" alt="Knowsee" height="80" />
+<img src="assets/knowsee.png" alt="Knowsee" height="120" align="middle" />
 
 **A fullstack reference implementation for building AI assistants with Google ADK and CopilotKit using AGUI, A2A and GenerativeUI**
 
