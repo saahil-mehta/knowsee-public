@@ -183,7 +183,7 @@ Open http://localhost:3000 and sign up. You'll receive an OTP via email (or chec
 | `GOOGLE_GENAI_USE_VERTEXAI` | Yes | `TRUE` for Vertex AI (recommended) or use API key |
 
 > [!NOTE]
-> This project uses Vertex AI for production parity — RAG Engine, Cloud SQL, and other GCP services require it. You can switch to a Gemini API key for simpler local testing.
+> This project uses Vertex AI for production parity — RAG Engine, Cloud SQL, and other GCP services require it. Switching to a Gemini API key requires code changes (not implemented out of the box).
 | `DATABASE_URL` | Yes | Postgres connection string |
 | `ENVIRONMENT` | No | `development` (default) or `production` |
 | `RAG_SIMILARITY_TOP_K` | No | RAG retrieval count (default: `10`) |
