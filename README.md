@@ -138,7 +138,10 @@ Edit both files with your values:
 | `GOOGLE_CLOUD_PROJECT` | sagent | [GCP Free Tier](https://cloud.google.com/free) includes Vertex AI credits |
 | `NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY` | web | [Free for personal use](https://cloud.copilotkit.ai) |
 | `BETTER_AUTH_SECRET` | web | Generate: `openssl rand -base64 32` |
-| `MAILGUN_*` | web | [Free tier](https://www.mailgun.com/pricing/) includes 1,000 emails/month |
+| `MAILGUN_*` | web | Optional — [Free tier](https://signup.mailgun.com/new/signup) for email OTP |
+
+> [!TIP]
+> **Mailgun is optional.** Without it, auth falls back to database sessions (no email verification).
 
 ### 3. Authenticate with GCP
 
