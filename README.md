@@ -5,6 +5,7 @@
 **A fullstack reference implementation for building AI assistants with Google ADK and CopilotKit using AGUI, A2A and GenerativeUI**
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Try Demo](https://img.shields.io/badge/Try_Demo-Live-green.svg)](https://knowsee-frontend-yrptvkizbq-ew.a.run.app)
 
 </div>
 
@@ -21,6 +22,16 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 <div align="center">
 <img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="100%" />
 </div>
+
+## Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Architecture](#architecture)
+- [Demo](#demo)
+- [License](#license)
 
 ## Features
 
