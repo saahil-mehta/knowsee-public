@@ -12,6 +12,14 @@
 
 Knowsee demonstrates how to build a multi-agent conversational AI using [Google Agent Development Kit (ADK)](https://github.com/google/adk-python) for the backend and [CopilotKit](https://copilotkit.ai) for the frontend, connected via the [AG-UI protocol](https://docs.ag-ui.com).
 
+<div align="center">
+<img src="assets/knowsee.gif" alt="Knowsee Chat" width="100%" />
+
+<br />
+
+<img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="100%" />
+</div>
+
 ## Features
 
 ### 🤖 Agentic Architecture
@@ -37,68 +45,6 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 - **Terraform IaC** — Cloud Run, Cloud SQL, Vertex AI, KMS
 - **SOPS Secrets** — Encrypted configuration management
 - **Scheduled Sync** — Automated RAG corpus updates from GDrive/OneDrive
-
-## Demo
-
-### 1. Create an Account
-
-Sign up with email and password.
-
-<div align="center">
-<img src="assets/create-account.png" alt="Create Account" width="600" />
-</div>
-
-### 2. Verify Your Email
-
-An OTP is sent to your inbox.
-
-<div align="center">
-<img src="assets/email-verification.png" alt="Email Verification" width="600" />
-
-<br />
-
-<img src="assets/otp.png" alt="Enter OTP" width="400" />
-</div>
-
-### 3. Welcome to Knowsee
-
-After verification, you're in.
-
-<div align="center">
-<img src="assets/verification.png" alt="Verified" width="600" />
-</div>
-
-### 4. Chat with Personality
-
-Ask anything — get up-to-date answers with a touch of humour.
-
-<div align="center">
-<img src="assets/new-chat-personality.gif" alt="Chat Personality" width="600" />
-</div>
-
-### 5. Sessions & Tools
-
-Conversations persist. Tools like Google Search just work.
-
-<div align="center">
-<img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="600" />
-</div>
-
-### 6. Light Mode
-
-For the light-mode lovers.
-
-<div align="center">
-<img src="assets/light-mode.gif" alt="Light Mode" width="600" />
-</div>
-
-### 7. Sign In & Out
-
-Seamless authentication flow.
-
-<div align="center">
-<img src="assets/auth-flow.gif" alt="Auth Flow" width="600" />
-</div>
 
 ## Prerequisites
 
@@ -184,6 +130,9 @@ Open http://localhost:3000 and sign up. You'll receive an OTP via email (or chec
 
 > [!NOTE]
 > This project uses Vertex AI for production parity — RAG Engine, Cloud SQL, and other GCP services require it. Switching to a Gemini API key requires code changes (not implemented out of the box).
+
+| Variable | Required | Description |
+|----------|----------|-------------|
 | `DATABASE_URL` | Yes | Postgres connection string |
 | `ENVIRONMENT` | No | `development` (default) or `production` |
 | `RAG_SIMILARITY_TOP_K` | No | RAG retrieval count (default: `10`) |
@@ -269,3 +218,60 @@ web/                             # Frontend (Next.js + CopilotKit)
     └── copilotkit-provider.tsx # Auth header injection
 ```
 
+## Demo
+
+### 1. Create an Account
+
+Sign up with email and password.
+
+<div align="center">
+<img src="assets/create-account.png" alt="Create Account" width="100%" />
+</div>
+
+### 2. Verify Your Email
+
+An OTP is sent to your inbox.
+
+<div align="center">
+<img src="assets/email-verification.png" alt="Email Verification" width="100%" />
+
+<br />
+
+<img src="assets/otp.png" alt="Enter OTP" width="100%" />
+</div>
+
+### 3. Welcome to Knowsee
+
+After verification, you're in.
+
+<div align="center">
+<img src="assets/verification.png" alt="Verified" width="100%" />
+</div>
+
+### 4. Chat with Personality
+
+Ask anything — get up-to-date answers with a touch of humour.
+
+<div align="center">
+<img src="assets/new-chat-personality.gif" alt="Chat Personality" width="100%" />
+</div>
+
+### 5. Light Mode
+
+For the light-mode lovers.
+
+<div align="center">
+<img src="assets/light-mode.gif" alt="Light Mode" width="100%" />
+</div>
+
+### 6. Sign In & Out
+
+Seamless authentication flow.
+
+<div align="center">
+<img src="assets/auth-flow.gif" alt="Auth Flow" width="100%" />
+</div>
+
+## License
+
+[Apache 2.0](LICENSE)
