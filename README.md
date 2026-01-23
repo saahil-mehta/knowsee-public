@@ -31,6 +31,7 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 - [Configuration](#configuration)
 - [Architecture](#architecture)
 - [Demo](#demo)
+- [Try Live Demo](#try-live-demo)
 - [License](#license)
 
 ## Features
@@ -286,6 +287,13 @@ Seamless authentication flow.
 <div align="center">
 <img src="assets/auth-flow.gif" alt="Auth Flow" width="100%" />
 </div>
+
+## Try Live Demo
+
+> [!NOTE]
+> Demo instance may be rate-limited or taken offline.
+
+**[→ Try Knowsee Live](https://knowsee-frontend-yrptvkizbq-ew.a.run.app)**
 
 ## License
 
