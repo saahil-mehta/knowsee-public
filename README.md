@@ -236,9 +236,11 @@ An OTP is sent to your inbox.
 
 <div align="center">
 <img src="assets/email-verification.png" alt="Email Verification" width="100%" />
+</div>
 
-<br />
+---
 
+<div align="center">
 <img src="assets/otp.png" alt="Enter OTP" width="100%" />
 </div>
 
