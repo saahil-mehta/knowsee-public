@@ -42,15 +42,18 @@ COPY . .
 # https://nextjs.org/docs/app/guides/upgrading/version-16
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Dummy build-time env vars (real values injected at runtime by Cloud Run)
-# These satisfy Next.js build validation but aren't used in the final image
+# Build-time env vars
+# NEXT_PUBLIC_* vars are inlined into JS at build time (required for client-side)
+# Other vars are placeholders - real values injected at runtime by Cloud Run
 ARG AGENT_URL=http://placeholder:8000
 ARG BETTER_AUTH_URL=http://placeholder:3000
 ARG DATABASE_URL=postgresql://placeholder:5432/placeholder
+ARG NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY
 
 ENV AGENT_URL=${AGENT_URL} \
     BETTER_AUTH_URL=${BETTER_AUTH_URL} \
-    DATABASE_URL=${DATABASE_URL}
+    DATABASE_URL=${DATABASE_URL} \
+    NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY=${NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY}
 
 RUN npx next build --webpack
 

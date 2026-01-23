@@ -5,7 +5,7 @@
 	tf-bootstrap tf-init tf-plan tf-apply tf-destroy tf-fmt tf-validate tf-output \
 	docker-build docker-push docker-build-backend docker-build-frontend \
 	cloud-restart cloud-restart-backend cloud-restart-frontend \
-	db-up db-down db-migrate db-migrate-prod db-proxy db-reset db-generate \
+	db-up db-down db-migrate db-migrate-prod db-proxy db-reset db-generate db-ui db-ui-down \
 	rag-bootstrap rag-bootstrap-skip-import rag-bootstrap-dry rag-list rag-sync \
 	lint fmt check \
 	test-e2e test-e2e-ui test-e2e-debug test-e2e-report \
@@ -63,6 +63,8 @@ help:
 	@printf "  make db-proxy          Start Cloud SQL Auth Proxy\n"
 	@printf "  make db-reset          Reset local database (dev only)\n"
 	@printf "  make db-generate       Generate Drizzle migration files\n"
+	@printf "  make db-ui             Start CloudBeaver web UI (localhost:8978)\n"
+	@printf "  make db-ui-down        Stop CloudBeaver\n"
 	@printf "\n\033[1;34mGCP\033[0m\n"
 	@printf "  make gcp-login              Full GCP authentication\n"
 	@printf "  make gcp-switch PROFILE=x   Switch GCP project profile\n"
@@ -252,6 +254,32 @@ db-generate:
 	@printf "\n[DB] Generating Drizzle migrations...\n\n"
 	@cd web && npm run db:generate
 	@printf "\n[DB] Migration files generated in web/drizzle/\n"
+
+# Start CloudBeaver web UI for database management
+db-ui: db-up
+	@printf "\n[DB] Starting CloudBeaver web UI...\n\n"
+	@docker compose -f docker-compose.local.yml --profile tools up -d cloudbeaver
+	@printf "Waiting for CloudBeaver to be ready..."
+	@until curl -s http://localhost:8978 > /dev/null 2>&1; do \
+		printf "."; \
+		sleep 2; \
+	done
+	@printf " ready!\n"
+	@printf "\n"
+	@printf "┌──────────────────────────────────────────────────────────────┐\n"
+	@printf "│  CloudBeaver: http://localhost:8978                          │\n"
+	@printf "├──────────────────────────────────────────────────────────────┤\n"
+	@printf "│  Add a connection (+ button) with these settings:            │\n"
+	@printf "│    Host: postgres    Port: 5432                              │\n"
+	@printf "│    Database: knowsee                                         │\n"
+	@printf "│    User: knowsee     Password: localdev                      │\n"
+	@printf "└──────────────────────────────────────────────────────────────┘\n"
+
+# Stop CloudBeaver web UI
+db-ui-down:
+	@printf "\n[DB] Stopping CloudBeaver...\n\n"
+	@docker compose -f docker-compose.local.yml --profile tools stop cloudbeaver
+	@printf "CloudBeaver stopped.\n"
 
 # ==============================================================================
 # Code Quality Commands
@@ -590,17 +618,26 @@ docker-build: docker-build-backend docker-build-frontend
 	@printf "  Frontend: $(FRONTEND_IMAGE)\n"
 	$(SEPARATOR)
 
+# NOCACHE=true to force full rebuild (e.g., make docker-build-frontend NOCACHE=true)
+DOCKER_CACHE_FLAG := $(if $(filter true,$(NOCACHE)),--no-cache,)
+
 docker-build-backend:
 	$(call check_env,docker-build-backend)
 	$(call PRINT_HEADER,Building Backend Image)
-	@printf "Image: $(BACKEND_IMAGE)\n\n"
-	docker build --platform linux/amd64 -t $(BACKEND_IMAGE) ./sagent
+	@printf "Image: $(BACKEND_IMAGE)\n"
+	@if [ -n "$(DOCKER_CACHE_FLAG)" ]; then printf "Cache: disabled\n"; fi
+	@printf "\n"
+	docker build --platform linux/amd64 $(DOCKER_CACHE_FLAG) -t $(BACKEND_IMAGE) ./sagent
 
 docker-build-frontend:
 	$(call check_env,docker-build-frontend)
 	$(call PRINT_HEADER,Building Frontend Image)
-	@printf "Image: $(FRONTEND_IMAGE)\n\n"
-	docker build --platform linux/amd64 -t $(FRONTEND_IMAGE) ./web
+	@printf "Image: $(FRONTEND_IMAGE)\n"
+	@if [ -n "$(DOCKER_CACHE_FLAG)" ]; then printf "Cache: disabled\n"; fi
+	@printf "\n"
+	docker build --platform linux/amd64 $(DOCKER_CACHE_FLAG) \
+		--build-arg NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY=$$(grep NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY web/.env.development | cut -d'=' -f2) \
+		-t $(FRONTEND_IMAGE) ./web
 
 docker-push:
 	$(call check_env,docker-push)
@@ -653,6 +690,7 @@ cloud-restart-backend:
 	@gcloud run services update $(CLOUD_RUN_BACKEND) \
 		--region=$(DOCKER_REGION) \
 		--project=$(DOCKER_PROJECT_ID) \
+		--image=$(BACKEND_IMAGE) \
 		--update-env-vars="FORCE_RESTART=$$(date +%s)"
 	@printf "\n\033[32mBackend restarted.\033[0m\n"
 
@@ -665,6 +703,7 @@ cloud-restart-frontend:
 	@gcloud run services update $(CLOUD_RUN_FRONTEND) \
 		--region=$(DOCKER_REGION) \
 		--project=$(DOCKER_PROJECT_ID) \
+		--image=$(FRONTEND_IMAGE) \
 		--update-env-vars="FORCE_RESTART=$$(date +%s)"
 	@printf "\n\033[32mFrontend restarted.\033[0m\n"
 
