@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/banner.png" alt="Knowsee Banner" height="150" align="middle"/>
+<img src="assets/banner.png" alt="Knowsee Banner" width="100%" />
 
 **A fullstack reference implementation for building AI assistants with Google ADK and CopilotKit using AGUI, A2A and GenerativeUI**
 
