@@ -165,6 +165,9 @@ This automatically:
 - Launches ADK backend → http://localhost:8000
 - Launches Next.js frontend → http://localhost:3000
 
+> [!NOTE]
+> **Database:** `make dev` spins up a Postgres container with default credentials (`knowsee/localdev`) — no manual setup required. Data persists in a Docker volume.
+
 ### 5. Create an Account
 
 Open http://localhost:3000 and sign up. You'll receive an OTP via email (or check Mailgun logs in sandbox mode).
