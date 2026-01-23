@@ -1,0 +1,27 @@
+project_id = "your-project-id"  # TODO: Replace with your GCP project ID
+region     = "europe-west1"
+
+labels = {
+  environment = "dev"
+  project     = "knowsee"
+  managed_by  = "terraform"
+  cost_center = "engineering"
+}
+
+# Artifact Registry
+artifact_registry_repository = "knowsee"
+
+# Cloud SQL
+cloud_sql_instance_name       = "knowsee-db-dev"
+cloud_sql_tier                = "db-f1-micro"
+cloud_sql_deletion_protection = false
+
+# KMS
+kms_keyring_name = "knowsee-sops"
+kms_key_name     = "sops-key"
+
+# Runtime
+runtime_environment = "production" # production = GCS storage, development = in-memory
+
+backend_url  = "https://your-backend.a.run.app"   # TODO: Replace after deploying Cloud Run
+frontend_url = "https://your-frontend.a.run.app"  # TODO: Replace after deploying Cloud Run

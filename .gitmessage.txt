@@ -1,0 +1,24 @@
+<type>(<optional-scope>): <subject>
+# Please run following to configure for your local workspace : git config commit.template .gitmessage.txt
+# Types: feat, fix, docs, style, refactor, perf, test, chore, ci, build, revert
+# Example: feat(terraform): add environment-based backend management OR feat(makefile): add environment parameter
+#
+# Subject must be written in lowercase, should be brief and concise.
+#
+# Body (optional):
+# - If needed, add further explanations here.
+# - Wrap text to 72 characters.
+
+
+# - **type**: Must be one of the following:
+# - **feat**: A new feature.
+# - **fix**: A bug fix.
+# - **docs**: Documentation changes.
+# - **style**: Code style changes (e.g., formatting).
+# - **refactor**: A code change that neither fixes a bug nor adds a feature.
+# - **perf**: A code change that improves performance.
+# - **test**: Adding or updating tests.
+# - **chore**: Routine tasks that don't change the codebase.
+# - **ci**: Changes to CI configuration files and scripts.
+# - **build**: Changes that affect the build system or external dependencies.
+# - **revert**: Revert a previous commit.

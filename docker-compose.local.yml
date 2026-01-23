@@ -1,0 +1,23 @@
+# Local development services (not for production)
+# Usage: make db-up / make db-down
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: knowsee-postgres
+    environment:
+      POSTGRES_USER: knowsee
+      POSTGRES_PASSWORD: localdev
+      POSTGRES_DB: knowsee
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U knowsee -d knowsee"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

@@ -1,0 +1,19 @@
+# SOPS configuration for Knowsee
+#
+# IMPORTANT: Update the GCP KMS paths below to match your project IDs.
+# Format: projects/<PROJECT_ID>/locations/global/keyRings/knowsee-sops/cryptoKeys/sops-key
+#
+# Alternatively, use the SOPS_GCP_KMS_IDS environment variable:
+#   export SOPS_GCP_KMS_IDS="projects/YOUR_PROJECT/locations/global/keyRings/knowsee-sops/cryptoKeys/sops-key"
+#   sops --encrypt secrets.yaml > secrets.enc.yaml
+
+creation_rules:
+  # Dev environment secrets
+  # TODO: Replace PROJECT_ID with your dev project ID
+  - path_regex: environments/dev/resources/secrets/.*\.ya?ml$
+    gcp_kms: projects/your-project-id/locations/global/keyRings/knowsee-sops/cryptoKeys/sops-key
+
+  # Prod environment secrets
+  # TODO: Replace PROJECT_ID with your prod project ID
+  # - path_regex: environments/prod/resources/secrets/.*\.ya?ml$
+  #   gcp_kms: projects/PROJECT_ID/locations/global/keyRings/knowsee-sops/cryptoKeys/sops-key

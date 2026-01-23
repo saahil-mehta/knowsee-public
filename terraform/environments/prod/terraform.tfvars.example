@@ -1,0 +1,25 @@
+# Production environment configuration
+# Copy this file to terraform.tfvars and update values
+
+project_id = "knowsee-prod"
+region     = "europe-west1"
+
+labels = {
+  environment = "prod"
+  project     = "knowsee"
+  managed_by  = "terraform"
+  cost_center = "engineering"
+}
+
+# Artifact Registry
+artifact_registry_repository = "knowsee"
+
+# Cloud SQL (production-grade settings)
+cloud_sql_instance_name       = "knowsee-db-prod"
+cloud_sql_tier                = "db-custom-2-4096"
+cloud_sql_deletion_protection = true
+cloud_sql_availability_type   = "REGIONAL"
+
+# KMS
+kms_keyring_name = "knowsee-sops"
+kms_key_name     = "sops-key"

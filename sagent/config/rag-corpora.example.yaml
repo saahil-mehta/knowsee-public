@@ -1,0 +1,54 @@
+# RAG Corpora Configuration
+# =============================================================================
+# This file defines team RAG corpora and their members.
+# Run `make rag-bootstrap` to apply this configuration.
+#
+# The bootstrap script will:
+#   1. Create RAG corpora in Vertex AI (if they don't exist)
+#   2. Populate the team_corpora table with corpus mappings
+#   3. Populate the user_teams table with member assignments
+#   4. Trigger initial file imports from GDrive folders
+# =============================================================================
+
+# Vertex AI configuration
+vertex_ai:
+  project: ${GOOGLE_CLOUD_PROJECT}    # Resolved from environment
+  location: ${GOOGLE_CLOUD_LOCATION}  # Resolved from environment (default: global)
+  embedding_model: text-embedding-005
+
+# Team corpora definitions
+# Each corpus maps to a GDrive folder and a team
+#
+# To add a new team corpus:
+#   1. Create a folder in GDrive for the team's documents
+#   2. Share the folder with Vertex AI's managed service account (Viewer):
+#      service-PROJECT_NUMBER@gcp-sa-vertex-rag.iam.gserviceaccount.com
+#   3. Add an entry below with team_id, display_name, source_type, and folder_url
+#   4. Run: make rag-bootstrap
+#
+# What happens on bootstrap:
+#   - Creates RAG corpus in Vertex AI (if it doesn't exist)
+#   - Imports documents from the GDrive folder (chunked for semantic search)
+#   - Stores corpus mapping in team_corpora table
+#
+corpora:
+  - team_id: Core
+    display_name: "Core Development Team"
+    source_type: gdrive
+    folder_url: "https://drive.google.com/drive/folders/YOUR_FOLDER_ID"  # TODO: Replace with your GDrive folder ID
+
+# Team membership assignments
+# Maps users (by email) to teams for access control.
+#
+# To add a new member:
+#   1. Add their email under the appropriate team_id
+#   2. Run: make rag-bootstrap
+#
+# What happens:
+#   - User is added to user_teams table
+#   - User can now query documents from that team's corpus
+#   - Users can belong to multiple teams (access multiple corpora)
+#
+team_members:
+  Core:
+    - user@example.com

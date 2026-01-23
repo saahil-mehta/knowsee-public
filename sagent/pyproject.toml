@@ -1,0 +1,54 @@
+[project]
+name = "sagent"
+version = "0.1.0"
+description = "Knowsee enterprise knowledge agent powered by ADK"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0.0",
+    "google-adk>=0.4.0",
+    "google-genai>=1.0.0",
+    "ag-ui-adk>=0.0.7",
+    "aiosqlite>=0.22.0",
+    "greenlet>=3.3.0",
+    # PostgreSQL driver for Cloud SQL (production)
+    "psycopg2-binary>=2.9.0",
+    # Dev tooling (always available for make check/fmt)
+    "ruff>=0.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    "E",      # pycodestyle errors
+    "W",      # pycodestyle warnings
+    "F",      # pyflakes
+    "I",      # isort
+    "UP",     # pyupgrade
+    "B",      # flake8-bugbear
+    "SIM",    # flake8-simplify
+]
+ignore = [
+    "E501",   # line too long (handled by formatter)
+    "B008",   # function call in default arg (FastAPI pattern)
+    "SIM105", # contextlib.suppress (explicit try/except often clearer)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"main.py" = ["E402"]  # imports after configure_logging() is intentional
+"__init__.py" = ["F401"]  # re-exports
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
