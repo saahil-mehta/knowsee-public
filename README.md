@@ -1,6 +1,8 @@
 <div align="center">
 
-<img src="assets/logo.svg" alt="Knowsee" width="80" />
+<img src="assets/links-line-dark.png" alt="Knowsee Icon" height="60" />
+&nbsp;&nbsp;
+<img src="assets/knowsee.png" alt="Knowsee" height="60" />
 
 # Knowsee
 
@@ -46,42 +48,58 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 
 Sign up with email and password.
 
+<div align="center">
 <img src="assets/create-account.png" alt="Create Account" width="600" />
+</div>
 
 ### 2. Verify Your Email
 
 An OTP is sent to your inbox.
 
+<div align="center">
 <img src="assets/email-verification.png" alt="Email Verification" width="600" />
 
+<br />
+
 <img src="assets/otp.png" alt="Enter OTP" width="400" />
+</div>
 
 ### 3. Welcome to Knowsee
 
 After verification, you're in.
 
+<div align="center">
 <img src="assets/verification.png" alt="Verified" width="600" />
+</div>
 
 ### 4. Chat with Personality
 
 Ask anything — get up-to-date answers with a touch of humour.
 
+<div align="center">
 <img src="assets/new-chat-personality.gif" alt="Chat Personality" width="600" />
+</div>
 
 ### 5. Sessions & Tools
 
 Conversations persist. Tools like Google Search just work.
 
+<div align="center">
 <img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="600" />
+</div>
 
 ### 6. Light Mode
 
 For the light-mode lovers.
 
+<div align="center">
 <img src="assets/light-mode.gif" alt="Light Mode" width="600" />
+</div>
 
 ### 7. Sign In & Out
 
 Seamless authentication flow.
 
+<div align="center">
 <img src="assets/auth-flow.gif" alt="Auth Flow" width="600" />
+</div>
