@@ -1,7 +1,6 @@
 <div align="center">
 
-<!-- TODO: Add logo -->
-<!-- <img src="assets/logo.png" alt="Knowsee" width="120" /> -->
+<img src="assets/logo.svg" alt="Knowsee" width="80" />
 
 # Knowsee
 
@@ -40,3 +39,49 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 - **Terraform IaC** — Cloud Run, Cloud SQL, Vertex AI, KMS
 - **SOPS Secrets** — Encrypted configuration management
 - **Scheduled Sync** — Automated RAG corpus updates from GDrive/OneDrive
+
+## Demo
+
+### 1. Create an Account
+
+Sign up with email and password.
+
+<img src="assets/create-account.png" alt="Create Account" width="600" />
+
+### 2. Verify Your Email
+
+An OTP is sent to your inbox.
+
+<img src="assets/email-verification.png" alt="Email Verification" width="600" />
+
+<img src="assets/otp.png" alt="Enter OTP" width="400" />
+
+### 3. Welcome to Knowsee
+
+After verification, you're in.
+
+<img src="assets/verification.png" alt="Verified" width="600" />
+
+### 4. Chat with Personality
+
+Ask anything — get up-to-date answers with a touch of humour.
+
+<img src="assets/new-chat-personality.gif" alt="Chat Personality" width="600" />
+
+### 5. Sessions & Tools
+
+Conversations persist. Tools like Google Search just work.
+
+<img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="600" />
+
+### 6. Light Mode
+
+For the light-mode lovers.
+
+<img src="assets/light-mode.gif" alt="Light Mode" width="600" />
+
+### 7. Sign In & Out
+
+Seamless authentication flow.
+
+<img src="assets/auth-flow.gif" alt="Auth Flow" width="600" />
