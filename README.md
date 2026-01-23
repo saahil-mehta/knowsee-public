@@ -14,9 +14,11 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 
 <div align="center">
 <img src="assets/knowsee.gif" alt="Knowsee Chat" width="100%" />
+</div>
 
-<br />
+---
 
+<div align="center">
 <img src="assets/sessions-tools.gif" alt="Sessions and Tools" width="100%" />
 </div>
 
