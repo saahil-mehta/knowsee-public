@@ -70,7 +70,7 @@ export function CopilotKitProvider({ children }: CopilotKitProviderProps) {
     <CopilotKit
       runtimeUrl="/api/copilotkit"
       agent="knowsee_agent"
-      publicLicenseKey="{process.env.NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY}"
+      publicLicenseKey={process.env.NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY}
       headers={userId ? { "x-user-id": userId } : undefined}
     >
       {children}

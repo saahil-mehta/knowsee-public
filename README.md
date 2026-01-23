@@ -99,3 +99,69 @@ Seamless authentication flow.
 <div align="center">
 <img src="assets/auth-flow.gif" alt="Auth Flow" width="600" />
 </div>
+
+## Prerequisites
+
+| Tool | Version | Purpose |
+|------|---------|---------|
+| [Node.js](https://nodejs.org/) | 20+ | Frontend runtime |
+| [Python](https://python.org/) | 3.11+ | Backend runtime |
+| [uv](https://docs.astral.sh/uv/) | Latest | Python package manager |
+| [Docker](https://docker.com/) | Latest | Local Postgres |
+| [gcloud CLI](https://cloud.google.com/sdk/gcloud) | Latest | GCP authentication |
+
+For deployment only:
+| [Terraform](https://terraform.io/) | 1.5+ | Infrastructure as Code |
+| [SOPS](https://github.com/getsops/sops) | Latest | Secrets encryption |
+
+## Quick Start
+
+### 1. Clone and Install
+
+```bash
+git clone https://github.com/saahil-mehta/knowsee-public.git
+cd knowsee-public
+make install
+```
+
+### 2. Configure Environment
+
+```bash
+cp sagent/.env.example sagent/.env.development
+cp web/.env.example web/.env.development
+```
+
+Edit both files with your values:
+
+| Variable | Where | Notes |
+|----------|-------|-------|
+| `GOOGLE_CLOUD_PROJECT` | sagent | [GCP Free Tier](https://cloud.google.com/free) includes Vertex AI credits |
+| `NEXT_PUBLIC_COPILOTKIT_PUBLIC_KEY` | web | [Free for personal use](https://cloud.copilotkit.ai) |
+| `BETTER_AUTH_SECRET` | web | Generate: `openssl rand -base64 32` |
+| `MAILGUN_*` | web | [Free tier](https://www.mailgun.com/pricing/) includes 1,000 emails/month |
+
+### 3. Authenticate with GCP
+
+Required for Vertex AI (Gemini models, RAG engine):
+
+```bash
+make gcp-login
+```
+
+### 4. Start Development
+
+Ensure Docker Desktop is running, then:
+
+```bash
+make dev
+```
+
+This automatically:
+- Starts local Postgres via Docker
+- Runs database migrations
+- Launches ADK backend → http://localhost:8000
+- Launches Next.js frontend → http://localhost:3000
+
+### 5. Create an Account
+
+Open http://localhost:3000 and sign up. You'll receive an OTP via email (or check Mailgun logs in sandbox mode).
