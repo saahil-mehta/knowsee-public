@@ -43,6 +43,7 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 - **Extended Thinking** — Gemini 2.5 Pro with dedicated reasoning budget
 - **AG-UI Protocol** — Bidirectional streaming between frontend and backend
 - **Generative UI** — Tool calls, reasoning, and sources as interactive components
+- **Data Analyst Agent** — Natural language to SQL with BigQuery, query tracking, chart widgets
 - **SSE Event Bus** — Live updates without polling
 
 ### 🔍 Retrieval & Grounding
@@ -189,17 +190,18 @@ Open http://localhost:3000 and sign up. You'll receive an OTP via email (or chec
 │  ├── Root Agent (Gemini 2.5 Pro + extended thinking)                        │
 │  │   ├── Team Knowledge Agent → Vertex AI RAG                               │
 │  │   ├── Web Search Agent → Google Search                                   │
+│  │   ├── Data Analyst Agent → BigQuery SQL execution                        │
 │  │   └── File Tools → Artifact storage                                      │
-│  └── Callbacks: user context injection, artifact injection                  │
+│  └── Callbacks: user context, artifacts, widgets                            │
 └─────────────────────────────────────────────────────────────────────────────┘
                                       │
-                    ┌─────────────────┼─────────────────┐
-                    ▼                 ▼                 ▼
-              ┌──────────┐     ┌──────────┐     ┌──────────┐
-              │ Postgres │     │ Vertex   │     │   GCS    │
-              │ Sessions │     │ AI RAG   │     │ Artifacts│
-              │ Auth     │     │ Engine   │     │          │
-              └──────────┘     └──────────┘     └──────────┘
+                    ┌────────────┬────┴────┬────────────┐
+                    ▼            ▼         ▼            ▼
+              ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
+              │ Postgres │ │ Vertex   │ │ BigQuery │ │   GCS    │
+              │ Sessions │ │ AI RAG   │ │ Analytics│ │ Artifacts│
+              │ Auth     │ │ Engine   │ │          │ │          │
+              └──────────┘ └──────────┘ └──────────┘ └──────────┘
 ```
 
 ### Data Flow
@@ -218,9 +220,10 @@ sagent/                          # Backend (ADK + FastAPI)
 ├── agents/
 │   ├── root.py                 # Main orchestrator
 │   ├── search.py               # Web search sub-agent
+│   ├── data_analyst/           # BigQuery SQL agent
 │   └── rag/agent.py            # Team knowledge sub-agent
 ├── callbacks/                  # Before/after LLM hooks
-├── tools/                      # File operations
+├── services/rag/               # RAG sync and config
 └── main.py                     # FastAPI server
 
 web/                             # Frontend (Next.js + CopilotKit)
@@ -229,6 +232,8 @@ web/                             # Frontend (Next.js + CopilotKit)
 │   ├── api/sessions/           # Session management
 │   └── chat/                   # Chat pages
 └── src/components/
+    ├── charts/                 # Recharts visualisations
+    ├── chat/tool-call/         # Modular tool renderers
     └── copilotkit-provider.tsx # Auth header injection
 ```
 
