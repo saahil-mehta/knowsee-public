@@ -219,7 +219,7 @@ export function PromptInput({
                   "size-8 text-muted-foreground",
                   "transition-all duration-200 ease-out",
                   "hover:border-border hover:bg-accent/50 hover:text-foreground",
-                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                  "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
                   "active:scale-[0.98]",
                   "disabled:pointer-events-none disabled:opacity-40",
                 )}
@@ -240,7 +240,7 @@ export function PromptInput({
               "size-8 bg-primary text-primary-foreground",
               "transition-all duration-200 ease-out",
               "hover:bg-primary/90 hover:shadow-md hover:shadow-primary/25",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+              "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
               "active:scale-[0.95]",
               "disabled:bg-muted disabled:text-muted-foreground disabled:shadow-none",
             )}

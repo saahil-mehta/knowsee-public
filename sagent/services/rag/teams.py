@@ -69,28 +69,32 @@ class BetterAuthTeamService(TeamMembershipService):
 
     def get_user_teams(self, user_id: str) -> list[str]:
         """Get teams from user_teams table."""
+        normalised_id = user_id.strip().lower()
         session = get_session()
         try:
             result = session.execute(
-                text("SELECT team_id FROM user_teams WHERE user_id = :user_id"),
-                {"user_id": user_id},
+                text(
+                    "SELECT team_id FROM user_teams WHERE LOWER(user_id) = :user_id"
+                ),
+                {"user_id": normalised_id},
             )
             teams = [row.team_id for row in result]
-            logger.debug(f"User {user_id} teams: {teams}")
+            logger.debug(f"User {normalised_id} teams: {teams}")
             return teams
         finally:
             session.close()
 
     def is_user_in_team(self, user_id: str, team_id: str) -> bool:
         """Check membership in user_teams table."""
+        normalised_id = user_id.strip().lower()
         session = get_session()
         try:
             result = session.execute(
                 text("""
                     SELECT 1 FROM user_teams
-                    WHERE user_id = :user_id AND team_id = :team_id
+                    WHERE LOWER(user_id) = :user_id AND team_id = :team_id
                 """),
-                {"user_id": user_id, "team_id": team_id},
+                {"user_id": normalised_id, "team_id": team_id},
             )
             return result.fetchone() is not None
         finally:

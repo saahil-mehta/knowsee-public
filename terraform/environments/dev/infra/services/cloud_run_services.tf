@@ -59,7 +59,7 @@ locals {
       memory                = "512Mi"
       min_instances         = 0
       max_instances         = 5
-      timeout_seconds       = 60
+      timeout_seconds       = 300
       service_account_email = var.service_account_emails.frontend
       ingress               = "INGRESS_TRAFFIC_ALL"
       # Public access enabled - org policy exception applied at project level

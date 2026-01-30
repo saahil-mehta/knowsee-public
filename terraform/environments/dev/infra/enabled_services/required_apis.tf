@@ -9,6 +9,9 @@ locals {
     "compute.googleapis.com",
     "storage.googleapis.com",
 
+    # Observability
+    "cloudtrace.googleapis.com",
+
     # AI/ML
     "aiplatform.googleapis.com",
 
@@ -29,5 +32,9 @@ locals {
 
     # Cloud Scheduler (for RAG corpus sync)
     "cloudscheduler.googleapis.com",
+
+    # Google Drive integration (for RAG corpus document access)
+    "drive.googleapis.com",
+    "picker.googleapis.com",
   ]
 }

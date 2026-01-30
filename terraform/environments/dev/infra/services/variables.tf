@@ -55,13 +55,13 @@ variable "frontend_url" {
 variable "mailgun_domain" {
   description = "Mailgun domain for sending emails"
   type        = string
-  default     = "mail.example.com"
+  default     = "verifications.knowsee.co.uk"
 }
 
 variable "mailgun_from" {
   description = "From address for Mailgun emails"
   type        = string
-  default     = "YourApp <noreply@mail.example.com>"
+  default     = "Knowsee <noreply@verifications.knowsee.co.uk>"
 }
 
 # =============================================================================

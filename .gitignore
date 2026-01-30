@@ -98,6 +98,7 @@ testbed/output.*
 # Playwright E2E
 web/e2e/test-results/
 web/e2e/playwright-report/
+web/e2e/.auth/
 
 # Build artifacts
 *.pyc

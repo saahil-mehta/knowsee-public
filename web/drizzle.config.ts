@@ -9,7 +9,7 @@ import { defineConfig } from "drizzle-kit";
  *   npx drizzle-kit push       # Push schema directly (dev only)
  *
  * For Cloud SQL, run migrations via Cloud SQL Auth Proxy:
- *   cloud-sql-proxy your-project-id:europe-west1:knowsee-db-dev &
+ *   cloud-sql-proxy sagent-development:europe-west1:knowsee-db-dev &
  *   DATABASE_URL="postgresql://knowsee:password@localhost:5432/knowsee" npx drizzle-kit migrate
  */
 export default defineConfig({

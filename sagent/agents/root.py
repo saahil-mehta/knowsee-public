@@ -13,6 +13,7 @@ from google.adk.planners import BuiltInPlanner
 from google.adk.tools.agent_tool import AgentTool
 from google.genai.types import ThinkingConfig
 
+from agents.data_analyst import data_analyst_agent
 from agents.rag import team_knowledge_agent
 from agents.search import search_agent
 from callbacks import (
@@ -56,6 +57,7 @@ root_agent = LlmAgent(
         read_file,
         AgentTool(agent=search_agent),
         AgentTool(agent=team_knowledge_agent),
+        AgentTool(agent=data_analyst_agent),
     ],
     before_model_callback=combined_before_model_callback,
     after_agent_callback=auto_generate_session_title,

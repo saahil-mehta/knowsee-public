@@ -397,6 +397,50 @@ body {
   animation: collapse-up 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Newton's Cradle streaming indicator animations */
+@keyframes cradle-swing {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-out;
+  }
+  25% {
+    transform: rotate(70deg);
+    animation-timing-function: ease-in;
+  }
+  50%,
+  100% {
+    transform: rotate(0deg);
+    animation-timing-function: linear;
+  }
+}
+
+@keyframes cradle-swing-reverse {
+  0%,
+  50% {
+    transform: rotate(0deg);
+    animation-timing-function: linear;
+  }
+  50.01% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-out;
+  }
+  75% {
+    transform: rotate(-70deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.animate-cradle-swing {
+  animation: cradle-swing 1.4s linear infinite;
+}
+
+.animate-cradle-swing-reverse {
+  animation: cradle-swing-reverse 1.4s linear infinite;
+}
+
 /* Tailwind v4 compatibility - define theme values as CSS custom properties */
 @theme {
   /* Font families */

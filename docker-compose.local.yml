@@ -19,5 +19,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # CloudBeaver - Web-based database management UI
+  # Usage: make db-ui / make db-ui-down
+  # Access: http://localhost:8978
+  cloudbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: knowsee-cloudbeaver
+    profiles:
+      - tools
+    ports:
+      - "8978:8978"
+    volumes:
+      - cloudbeaver_data:/opt/cloudbeaver/workspace
+      - ./.cloudbeaver/cloudbeaver.conf:/opt/cloudbeaver/conf/cloudbeaver.conf:ro
+      - ./.cloudbeaver/initial-data-sources.conf:/opt/cloudbeaver/conf/initial-data-sources.conf:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
+  cloudbeaver_data:

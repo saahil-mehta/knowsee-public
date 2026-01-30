@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { SettingsIcon, LogOutIcon, BadgeCheck } from "lucide-react";
+import { SettingsIcon, LogOutIcon, BadgeCheck, MessageSquareText } from "lucide-react";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -66,6 +66,10 @@ export function UserMenu() {
           <DropdownMenuItem onClick={() => setSettingsOpen(true)}>
             <SettingsIcon className="mr-2 size-4" />
             Settings
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => router.push("/feedback")}>
+            <MessageSquareText className="mr-2 size-4" />
+            Feedback
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem

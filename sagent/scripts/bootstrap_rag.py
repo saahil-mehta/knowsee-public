@@ -24,6 +24,7 @@ import os
 import re
 import sys
 import uuid
+from email.utils import parseaddr
 from pathlib import Path
 
 import yaml
@@ -34,6 +35,7 @@ from sqlalchemy import text
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from services.db import get_session
+from services.rag.config import build_import_kwargs
 
 # Configure logging
 logging.basicConfig(
@@ -164,8 +166,24 @@ def upsert_team_corpus(
         session.close()
 
 
+def validate_email(email: str) -> str:
+    """Validate email format and return normalised (lowercase) form.
+
+    Raises:
+        ValueError: If email format is invalid.
+    """
+    _, addr = parseaddr(email.strip())
+    if not addr or "@" not in addr:
+        raise ValueError(f"Invalid email format: {email}")
+    return addr.lower()
+
+
 def upsert_user_team(user_id: str, team_id: str, role: str = "member") -> None:
-    """Insert or update user_teams record."""
+    """Insert or update user_teams record.
+
+    Emails are normalised to lowercase for case-insensitive matching.
+    """
+    normalised_id = validate_email(user_id)
     session = get_session()
     try:
         # Upsert using ON CONFLICT (PostgreSQL)
@@ -176,27 +194,32 @@ def upsert_user_team(user_id: str, team_id: str, role: str = "member") -> None:
                 ON CONFLICT (user_id, team_id)
                 DO UPDATE SET role = :role
             """),
-            {"user_id": user_id, "team_id": team_id, "role": role},
+            {"user_id": normalised_id, "team_id": team_id, "role": role},
         )
         session.commit()
-        logger.debug(f"Upserted user_team: {user_id} -> {team_id}")
+        logger.debug(f"Upserted user_team: {normalised_id} -> {team_id}")
     finally:
         session.close()
 
 
-def import_files(corpus_name: str, folder_url: str) -> None:
+def import_files(
+    corpus_name: str,
+    folder_url: str,
+    import_kwargs: dict | None = None,
+) -> None:
     """Trigger file import from GDrive folder to corpus."""
     try:
         from vertexai.preview import rag
 
         logger.info(f"Importing files from {folder_url} to {corpus_name}")
 
-        rag.import_files(
-            corpus_name=corpus_name,
-            paths=[folder_url],
-            chunk_size=512,
-            chunk_overlap=100,
-        )
+        kwargs: dict = {
+            "corpus_name": corpus_name,
+            "paths": [folder_url],
+            **(import_kwargs or {"chunk_size": 512, "chunk_overlap": 100}),
+        }
+
+        rag.import_files(**kwargs)
 
         logger.info(f"File import triggered for {corpus_name}")
     except Exception as e:
@@ -225,6 +248,9 @@ def bootstrap(
     vertexai.init(project=project, location=location)
 
     logger.info(f"Vertex AI: project={project}, location={location}")
+
+    # Build import configuration (chunking + optional LLM parser)
+    import_kwargs = build_import_kwargs(config)
 
     corpora = config.get("corpora", [])
     team_members = config.get("team_members", {})
@@ -265,7 +291,7 @@ def bootstrap(
         # Trigger file import unless skipped
         if not skip_import:
             try:
-                import_files(corpus_name, folder_url)
+                import_files(corpus_name, folder_url, import_kwargs)
             except Exception as e:
                 logger.warning(f"File import failed (continuing): {e}")
 

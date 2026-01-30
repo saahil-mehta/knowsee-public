@@ -23,6 +23,7 @@ from enum import Enum
 from sqlalchemy import text
 
 from services.db import get_session
+from services.rag.config import build_import_kwargs, load_rag_config
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +66,8 @@ class SyncService:
     def __init__(self):
         self._project = os.getenv("GOOGLE_CLOUD_PROJECT")
         self._location = os.getenv("GOOGLE_CLOUD_LOCATION", "global")
+        self._rag_config = load_rag_config()
+        self._import_kwargs = build_import_kwargs(self._rag_config)
 
     def _get_all_corpora(self) -> list[dict]:
         """Get all corpora from database."""
@@ -157,12 +160,14 @@ class SyncService:
 
             # Import files from source folder
             # This is idempotent - unchanged files are skipped
+            import_kwargs = {
+                "corpus_name": corpus_name,
+                "paths": [folder_url],
+                **self._import_kwargs,
+            }
             await asyncio.to_thread(
                 rag.import_files,
-                corpus_name=corpus_name,
-                paths=[folder_url],
-                chunk_size=512,
-                chunk_overlap=100,
+                **import_kwargs,
             )
 
             # Get file count (approximate - count chunks/files in corpus)

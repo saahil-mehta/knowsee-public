@@ -7,7 +7,7 @@ import { Streamdown } from "streamdown";
 import { ChevronRightIcon } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ToolCallDisplay } from "./tool-call";
-import { GroundingDisplay, extractGroundingData, type GroundingData } from "./grounding-display";
+import { StreamingIndicator } from "./streaming-indicator";
 
 // Semantic tag constants - must match backend (sagent/utils/semantic_tags.py)
 const THOUGHT_TAG_OPEN = "<llm:adk:soch>";
@@ -16,8 +16,6 @@ const TOOL_TAG_OPEN_PATTERN = /<llm:adk:tool name="([^"]*)" id="([^"]*)">/;
 const TOOL_TAG_CLOSE = "</llm:adk:tool>";
 const TOOL_RESULT_TAG_OPEN_PATTERN = /<llm:adk:tool-result id="([^"]*)">/;
 const TOOL_RESULT_TAG_CLOSE = "</llm:adk:tool-result>";
-// Sources markers - with or without stripped brackets (closing handled by extractGroundingData)
-const SOURCES_MARKERS = ["<llm:adk:sources>", "llm:adk:sources{"];
 
 type ToolCallData = {
   name: string;
@@ -34,15 +32,14 @@ type ContentSegment =
   | { type: "thought"; content: string; isComplete: boolean }
   | { type: "response"; content: string; isComplete: boolean }
   | { type: "tool-call"; data: ToolCallData; isComplete: boolean }
-  | { type: "tool-result"; data: ToolResultData; isComplete: boolean }
-  | { type: "sources"; data: GroundingData; isComplete: boolean };
+  | { type: "tool-result"; data: ToolResultData; isComplete: boolean };
 
 /**
  * Find the next semantic tag in the content string.
  * Returns the tag type, position, and match data, or null if no tags found.
  */
 function findNextTag(content: string): {
-  type: "thought" | "tool" | "tool-result" | "sources";
+  type: "thought" | "tool" | "tool-result";
   index: number;
   match: RegExpMatchArray | null;
 } | null {
@@ -50,17 +47,8 @@ function findNextTag(content: string): {
   const toolMatch = content.match(TOOL_TAG_OPEN_PATTERN);
   const toolResultMatch = content.match(TOOL_RESULT_TAG_OPEN_PATTERN);
 
-  // Find earliest sources marker (handles stripped brackets)
-  let sourcesIdx = -1;
-  for (const marker of SOURCES_MARKERS) {
-    const idx = content.indexOf(marker);
-    if (idx !== -1 && (sourcesIdx === -1 || idx < sourcesIdx)) {
-      sourcesIdx = idx;
-    }
-  }
-
   const candidates: {
-    type: "thought" | "tool" | "tool-result" | "sources";
+    type: "thought" | "tool" | "tool-result";
     index: number;
     match: RegExpMatchArray | null;
   }[] = [];
@@ -73,9 +61,6 @@ function findNextTag(content: string): {
   }
   if (toolResultMatch?.index !== undefined) {
     candidates.push({ type: "tool-result", index: toolResultMatch.index, match: toolResultMatch });
-  }
-  if (sourcesIdx !== -1) {
-    candidates.push({ type: "sources", index: sourcesIdx, match: null });
   }
 
   if (candidates.length === 0) return null;
@@ -181,22 +166,6 @@ function parseContentSegments(content: string): ContentSegment[] {
         isComplete: true,
       });
       remaining = afterOpen.slice(closeIdx + TOOL_RESULT_TAG_CLOSE.length);
-    } else if (nextTag.type === "sources") {
-      // Use shared extraction logic (handles stripped brackets, malformed JSON)
-      const textFromMarker = remaining.slice(nextTag.index);
-      const { data: groundingData, cleanedText } = extractGroundingData(textFromMarker);
-
-      if (groundingData && (groundingData.queries.length > 0 || groundingData.sources.length > 0)) {
-        rawSegments.push({
-          type: "sources",
-          data: groundingData,
-          isComplete: true,
-        });
-      }
-
-      // Calculate how much to skip - the extraction cleaned the text
-      const skippedLength = textFromMarker.length - cleanedText.length;
-      remaining = remaining.slice(nextTag.index + skippedLength) || cleanedText;
     }
   }
 
@@ -417,13 +386,11 @@ export const MessageResponse = memo(
             );
           }
 
-          // Sources segment (from Google Search grounding)
-          if (segment.type === "sources") {
-            return <GroundingDisplay key={`sources-${idx}`} data={segment.data} />;
-          }
-
           return null;
         })}
+
+        {/* Newton's Cradle indicator - shows below streaming text */}
+        {isStreaming && <StreamingIndicator size={36} />}
       </div>
     );
   },

@@ -102,13 +102,17 @@ export const teamCorpora = pgTable(
     corpusName: text("corpus_name").notNull(),
     sourceType: text("source_type").notNull(), // 'gdrive' | 'onedrive'
     folderUrl: text("folder_url").notNull(),
+    emailDomain: text("email_domain"), // Organisation domain (e.g. 'knowsee.co.uk')
     lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),
     lastSyncStatus: text("last_sync_status"), // 'pending' | 'in_progress' | 'completed' | 'failed'
     fileCount: integer("file_count").default(0),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [index("team_corpora_team_id_idx").on(table.teamId)],
+  (table) => [
+    index("team_corpora_team_id_idx").on(table.teamId),
+    index("team_corpora_email_domain_idx").on(table.emailDomain),
+  ],
 );
 
 /**
@@ -127,5 +131,58 @@ export const userTeams = pgTable(
     primaryKey({ columns: [table.userId, table.teamId] }),
     index("user_teams_user_id_idx").on(table.userId),
     index("user_teams_team_id_idx").on(table.teamId),
+  ],
+);
+
+// =============================================================================
+// Feedback Table
+// =============================================================================
+
+/**
+ * User feedback submissions.
+ * Stores categorised feedback from authenticated users.
+ */
+export const feedback = pgTable(
+  "feedback",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    category: text("category").notNull(), // 'bug' | 'feature_request' | 'question' | 'other'
+    message: text("message").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("feedback_user_id_idx").on(table.userId),
+    index("feedback_created_at_idx").on(table.createdAt),
+  ],
+);
+
+// =============================================================================
+// Team Join Requests
+// =============================================================================
+
+/**
+ * Team join requests.
+ * Self-service team membership with admin approval via email.
+ */
+export const teamJoinRequests = pgTable(
+  "team_join_requests",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(), // Requesting user's email (lowercase)
+    teamId: text("team_id").notNull(), // Domain-prefixed team ID
+    status: text("status").notNull().default("pending"), // 'pending' | 'approved' | 'rejected' | 'expired'
+    token: text("token").notNull().unique(), // UUID v4 for email links
+    tokenExpiresAt: timestamp("token_expires_at", { withTimezone: true }).notNull(),
+    decidedBy: text("decided_by"), // Admin email who approved/rejected
+    decidedAt: timestamp("decided_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("team_join_requests_token_idx").on(table.token),
+    index("team_join_requests_user_id_idx").on(table.userId),
+    index("team_join_requests_team_id_idx").on(table.teamId),
   ],
 );

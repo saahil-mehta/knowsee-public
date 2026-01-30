@@ -55,7 +55,7 @@ help:
 	@printf "  make test-e2e-ui     Run tests with interactive UI\n"
 	@printf "  make test-e2e-debug  Run tests in debug mode\n"
 	@printf "  make test-e2e-report View the last test report\n"
-	@printf "\n\033[1;34mDatabase\033[0m\n"
+	@printf "\n\033[1;34mDatabase\033[0m\n" 
 	@printf "  make db-up             Start local Postgres (Docker)\n"
 	@printf "  make db-down           Stop local Postgres\n"
 	@printf "  make db-migrate        Apply migrations to local Postgres\n"
@@ -176,7 +176,7 @@ install-web:
 # Database Commands
 # ==============================================================================
 # Usage: make db-<command>
-#
+# Flow:  schema.ts → db-generate → db-migrate (local) → commit → db-migrate-prod (GCP)
 # Local development (Postgres via Docker):
 #   db-up            - Start local Postgres container
 #   db-down          - Stop local Postgres container
@@ -342,9 +342,29 @@ check:
 #
 # Prerequisites:
 #   1. make db-up && make db-migrate
-#   2. make dev (in separate terminal)
-#   3. make test-e2e
+#   2. Create test user: Register via UI at http://localhost:3000/register
+#      - Use any email/password, then set in web/.env.development:
+#        E2E_TEST_USER_EMAIL=your-test-email@example.com
+#        E2E_TEST_USER_PASSWORD=your-test-password
+#   3. make dev (in separate terminal)
+#   4. make test-e2e
 # ==============================================================================
+
+# Check that E2E test user credentials are configured
+define check_e2e_credentials
+	@email=$$(grep -E '^E2E_TEST_USER_EMAIL=' ./web/.env.development 2>/dev/null | cut -d'=' -f2-); \
+	password=$$(grep -E '^E2E_TEST_USER_PASSWORD=' ./web/.env.development 2>/dev/null | cut -d'=' -f2-); \
+	if [ -z "$$email" ] || [ -z "$$password" ]; then \
+		printf "\n\033[31mError: E2E test user not configured.\033[0m\n\n"; \
+		printf "To run E2E tests, you need a test user account:\n\n"; \
+		printf "  1. Start the app:  make dev\n"; \
+		printf "  2. Register a test user at http://localhost:3000/register\n"; \
+		printf "  3. Add credentials to web/.env.development:\n"; \
+		printf "     E2E_TEST_USER_EMAIL=your-email@example.com\n"; \
+		printf "     E2E_TEST_USER_PASSWORD=your-password\n\n"; \
+		exit 1; \
+	fi
+endef
 
 # Check that dev servers are running before E2E tests
 define check_dev_servers
@@ -360,18 +380,21 @@ define check_dev_servers
 endef
 
 test-e2e:
+	$(check_e2e_credentials)
 	$(check_dev_servers)
 	$(call PRINT_HEADER,E2E Tests)
 	@printf "Running Playwright tests (headless)...\n\n"
 	@cd web && npm run test:e2e
 
 test-e2e-ui:
+	$(check_e2e_credentials)
 	$(check_dev_servers)
 	$(call PRINT_HEADER,E2E Tests - Interactive UI)
 	@printf "Opening Playwright UI...\n\n"
 	@cd web && npm run test:e2e:ui
 
 test-e2e-debug:
+	$(check_e2e_credentials)
 	$(check_dev_servers)
 	$(call PRINT_HEADER,E2E Tests - Debug Mode)
 	@printf "Running tests in debug mode...\n\n"

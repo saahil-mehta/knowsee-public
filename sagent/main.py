@@ -71,6 +71,9 @@ def extract_user_id(input_data: RunAgentInput) -> str:
         if isinstance(headers, dict):
             user_id = headers.get("user_id")
             if user_id:
+                # Normalise to lowercase for case-insensitive matching
+                # across auth providers and team membership lookups
+                user_id = user_id.strip().lower()
                 logging.debug(
                     f"[extract_user_id] authenticated request: user_id={user_id}, "
                     f"thread_id={input_data.thread_id}"
@@ -401,7 +404,6 @@ async def get_session(session_id: str, user_id: str):
         if not session:
             return {"error": "Session not found"}
 
-        messages = []
         # Collect tool results separately for merging with their calls
         pending_tool_results: dict[str, str] = {}  # tool_id -> result_json
 

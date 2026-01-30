@@ -42,11 +42,10 @@ async def inject_user_context(
 
     # Get user ID from session
     user_id = state.get("user_id")
-    if not user_id:
+    if not user_id and callback_context.session:
         # Try to get from session object
-        if callback_context.session:
-            user_id = callback_context.session.user_id
-            state["user_id"] = user_id
+        user_id = callback_context.session.user_id
+        state["user_id"] = user_id
 
     if not user_id:
         logger.debug("No user_id in session, skipping user context injection")

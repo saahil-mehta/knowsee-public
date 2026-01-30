@@ -2,6 +2,9 @@ import { defineConfig, devices } from "@playwright/test";
 import { config } from "dotenv";
 import { resolve } from "path";
 
+// Auth state file path (must match auth.setup.ts)
+const STORAGE_STATE_PATH = resolve(__dirname, "e2e/.auth/user.json");
+
 // Load environment variables from .env.development
 config({ path: resolve(__dirname, ".env.development") });
 
@@ -50,11 +53,32 @@ export default defineConfig({
     timeout: 5_000,
   },
 
-  // Browser projects - Chromium only for macOS local development
+  // Browser projects with authentication setup
   projects: [
+    // Setup project - runs once to authenticate and save state
     {
-      name: "chromium",
+      name: "setup",
+      testMatch: /auth\.setup\.ts/,
+    },
+
+    // Unauthenticated tests - login forms, registration, smoke tests
+    // These run WITHOUT storageState (fresh browser, no cookies)
+    {
+      name: "unauthenticated",
       use: { ...devices["Desktop Chrome"] },
+      testMatch: /\/(auth|smoke|authenticated)\.spec\.ts/,
+    },
+
+    // Conversation tests - use saved auth state to avoid re-login each test
+    // Depends on setup project to run first
+    {
+      name: "conversation",
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: STORAGE_STATE_PATH,
+      },
+      dependencies: ["setup"],
+      testMatch: /\/conversation\.spec\.ts/,
     },
   ],
 
