@@ -51,6 +51,8 @@ Knowsee demonstrates how to build a multi-agent conversational AI using [Google 
 - **Vertex AI RAG Engine** — Semantic search with team-scoped corpus access
 - **Web Search Grounding** — Google Search with inline citations
 - **Multi-Source Synthesis** — RAG + web + uploads unified in responses
+- **Google Drive Picker** — Import files directly from Drive with OAuth
+- **Wide Format Support** — png, jpeg, gif, webp, pdf, txt, csv, md, html, docx, doc, xlsx, xls, pptx, ppt, odt, ods, odp, rtf, Google Docs/Sheets/Slides
 
 ### 🏗️ Production-Ready
 
@@ -292,6 +294,12 @@ Seamless authentication flow.
 <div align="center">
 <img src="assets/auth-flow.gif" alt="Auth Flow" width="100%" />
 </div>
+
+### 7. Google Drive Import
+
+Import files directly from your Google Drive into conversations.
+
+*Demo coming soon*
 
 ## Try Live Demo
 
