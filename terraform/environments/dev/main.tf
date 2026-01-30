@@ -276,6 +276,9 @@ module "cloud_run_services_definition" {
   mailgun_domain = var.mailgun_domain
   mailgun_from   = var.mailgun_from
 
+  # Google OAuth (for Drive Picker integration)
+  google_oauth_client_id = var.google_oauth_client_id
+
   # Artifact storage
   artifact_bucket = "${var.artifact_bucket_name}-${var.project_id}"
 

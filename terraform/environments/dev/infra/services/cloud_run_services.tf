@@ -77,6 +77,8 @@ locals {
         # Mailgun configuration
         MAILGUN_DOMAIN = var.mailgun_domain
         MAILGUN_FROM   = var.mailgun_from
+        # Google OAuth (for Drive Picker)
+        NEXT_PUBLIC_GOOGLE_CLIENT_ID = var.google_oauth_client_id
       }
 
       # Secrets (from Secret Manager)
@@ -91,6 +93,10 @@ locals {
         }
         MAILGUN_API_KEY = {
           secret_name = "mailgun-api-key"
+          version     = "latest"
+        }
+        GOOGLE_OAUTH_CLIENT_SECRET = {
+          secret_name = "google-oauth-client-secret"
           version     = "latest"
         }
       }

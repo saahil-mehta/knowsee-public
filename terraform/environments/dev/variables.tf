@@ -87,6 +87,16 @@ variable "mailgun_from" {
 }
 
 # =============================================================================
+# Google OAuth Configuration (for Drive Picker integration)
+# =============================================================================
+
+variable "google_oauth_client_id" {
+  description = "Google OAuth 2.0 client ID for Drive Picker (public, exposed to frontend)"
+  type        = string
+  default     = ""
+}
+
+# =============================================================================
 # Artifact Storage
 # =============================================================================
 

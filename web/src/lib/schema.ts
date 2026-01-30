@@ -5,7 +5,16 @@
  * Better Auth requires these tables for authentication.
  */
 
-import { pgTable, text, timestamp, boolean, index, integer, primaryKey } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  index,
+  integer,
+  primaryKey,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
@@ -87,6 +96,36 @@ export const twoFactor = pgTable(
 );
 
 // =============================================================================
+// OAuth Connections - Third-party service tokens (separate from app auth)
+// =============================================================================
+
+/**
+ * OAuth connections for external services.
+ * Stores tokens for Google Drive, etc.
+ */
+export const oauthConnections = pgTable(
+  "oauth_connections",
+  {
+    id: text("id").primaryKey(),
+    userId: text("userId")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    provider: text("provider").notNull(), // 'google_drive', etc.
+    accessToken: text("accessToken").notNull(),
+    refreshToken: text("refreshToken"),
+    tokenExpiry: timestamp("tokenExpiry"),
+    scopes: text("scopes"), // Space-separated list of granted scopes
+    providerEmail: text("providerEmail"), // Email of connected account (for display)
+    createdAt: timestamp("createdAt").notNull().defaultNow(),
+    updatedAt: timestamp("updatedAt").notNull().defaultNow(),
+  },
+  (table) => [
+    index("oauth_connections_userId_idx").on(table.userId),
+    uniqueIndex("oauth_connections_userId_provider_idx").on(table.userId, table.provider),
+  ],
+);
+
+// =============================================================================
 // RAG Tables - Team-based corpus access control
 // =============================================================================
 
@@ -100,7 +139,7 @@ export const teamCorpora = pgTable(
     id: text("id").primaryKey(),
     teamId: text("team_id").notNull().unique(),
     corpusName: text("corpus_name").notNull(),
-    sourceType: text("source_type").notNull(), // 'gdrive' | 'onedrive'
+    sourceType: text("source_type").notNull(), // 'gdrive'
     folderUrl: text("folder_url").notNull(),
     emailDomain: text("email_domain"), // Organisation domain (e.g. 'knowsee.co.uk')
     lastSyncAt: timestamp("last_sync_at", { withTimezone: true }),

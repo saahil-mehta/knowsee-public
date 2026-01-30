@@ -73,9 +73,7 @@ class BetterAuthTeamService(TeamMembershipService):
         session = get_session()
         try:
             result = session.execute(
-                text(
-                    "SELECT team_id FROM user_teams WHERE LOWER(user_id) = :user_id"
-                ),
+                text("SELECT team_id FROM user_teams WHERE LOWER(user_id) = :user_id"),
                 {"user_id": normalised_id},
             )
             teams = [row.team_id for row in result]

@@ -14,7 +14,9 @@ import yaml
 logger = logging.getLogger(__name__)
 
 # Default config path relative to sagent/
-_DEFAULT_CONFIG_PATH = Path(__file__).parent.parent.parent / "config" / "rag-corpora.yaml"
+_DEFAULT_CONFIG_PATH = (
+    Path(__file__).parent.parent.parent / "config" / "rag-corpora.yaml"
+)
 
 
 def load_rag_config(config_path: Path | None = None) -> dict:
@@ -94,8 +96,7 @@ def build_import_kwargs(config: dict) -> dict:
         location = vertex_config.get("location", "global")
         model = parser_config.get("model", "gemini-2.0-flash-lite")
         model_name = (
-            f"projects/{project}/locations/{location}"
-            f"/publishers/google/models/{model}"
+            f"projects/{project}/locations/{location}/publishers/google/models/{model}"
         )
         max_rpm = parser_config.get("max_parsing_requests_per_min")
 

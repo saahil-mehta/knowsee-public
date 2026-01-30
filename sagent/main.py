@@ -37,6 +37,8 @@ from google.genai import types
 
 import patches  # noqa: F401 - side effect import applies thought tag patch
 from agent import root_agent
+from converters import convert_file, needs_conversion
+from converters.base import ConversionError
 from services.events import event_bus
 from services.titles import get_titles_bulk
 from utils.semantic_tags import (
@@ -284,6 +286,24 @@ async def upload_file(
             },
         )
 
+    # Convert non-native formats to Markdown
+    filename = file.filename or "upload"
+    if needs_conversion(content_type):
+        try:
+            result = convert_file(file_bytes, content_type, filename)
+            file_bytes = result.content
+            content_type = result.mime_type
+            filename = result.filename
+            logger.info(f"Converted {file.filename} to {filename} ({content_type})")
+        except ConversionError as e:
+            raise HTTPException(
+                status_code=422,
+                detail={
+                    "error": "conversion_failed",
+                    "message": f"Failed to convert file: {e}",
+                },
+            ) from e
+
     # Create artifact Part
     artifact = types.Part.from_bytes(data=file_bytes, mime_type=content_type)
 
@@ -294,17 +314,18 @@ async def upload_file(
             app_name=APP_NAME,
             user_id=user_id,
             session_id=session_id,
-            filename=file.filename,
+            filename=filename,
             artifact=artifact,
         )
 
         logging.info(
-            f"Saved artifact: {file.filename} v{version} for session {session_id}, "
+            f"Saved artifact: {filename} v{version} for session {session_id}, "
             f"user_id: {user_id}, app_name: {APP_NAME}"
         )
 
         return {
-            "filename": file.filename,
+            "filename": filename,
+            "original_filename": file.filename,
             "version": version,
             "mime_type": content_type,
             "size_bytes": len(file_bytes),

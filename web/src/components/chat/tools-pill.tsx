@@ -1,25 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChevronDownIcon, FileTextIcon, ExternalLinkIcon } from "lucide-react";
+import { ChevronDownIcon, SearchIcon, DatabaseIcon, WrenchIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
-type Team = {
-  teamId: string;
-  displayName: string;
-  folderUrl: string;
-  sourceType: string;
-  fileCount: number;
-  lastSyncAt: string | null;
+type Tool = {
+  id: string;
+  name: string;
+  description: string;
+  icon: "search" | "database" | "file-text";
+  alwaysAvailable: boolean;
 };
 
-type SourcesPillProps = {
+type ToolsPillProps = {
   className?: string;
   /** Controlled open state */
   isOpen?: boolean;
@@ -27,20 +25,26 @@ type SourcesPillProps = {
   onOpenChange?: (open: boolean) => void;
 };
 
-export function SourcesPill({ className, isOpen, onOpenChange }: SourcesPillProps) {
-  const [teams, setTeams] = useState<Team[]>([]);
+const iconMap = {
+  search: SearchIcon,
+  database: DatabaseIcon,
+  "file-text": WrenchIcon,
+} as const;
+
+export function ToolsPill({ className, isOpen, onOpenChange }: ToolsPillProps) {
+  const [tools, setTools] = useState<Tool[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchTeams() {
+    async function fetchTools() {
       try {
-        const response = await fetch("/api/teams");
+        const response = await fetch("/api/tools");
         if (!response.ok) {
-          throw new Error("Failed to fetch teams");
+          throw new Error("Failed to fetch tools");
         }
         const data = await response.json();
-        setTeams(data.teams || []);
+        setTools(data.tools || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
@@ -48,11 +52,11 @@ export function SourcesPill({ className, isOpen, onOpenChange }: SourcesPillProp
       }
     }
 
-    fetchTeams();
+    fetchTools();
   }, []);
 
-  // Don't render if loading, error, or no teams
-  if (isLoading || error || teams.length === 0) {
+  // Don't render if loading, error, or no tools
+  if (isLoading || error || tools.length === 0) {
     return null;
   }
 
@@ -73,8 +77,8 @@ export function SourcesPill({ className, isOpen, onOpenChange }: SourcesPillProp
             className,
           )}
         >
-          <FileTextIcon className="size-3.5 transition-transform duration-200 group-hover:scale-110 group-data-[state=open]:scale-110" />
-          <span className="font-medium">Sources</span>
+          <WrenchIcon className="size-3.5 transition-transform duration-200 group-hover:scale-110 group-data-[state=open]:scale-110" />
+          <span className="font-medium">Tools</span>
           <ChevronDownIcon className="size-3 opacity-50 transition-all duration-200 group-hover:rotate-90 group-hover:opacity-80 group-data-[state=open]:rotate-180 group-data-[state=open]:opacity-80" />
         </button>
       </DropdownMenuTrigger>
@@ -82,37 +86,28 @@ export function SourcesPill({ className, isOpen, onOpenChange }: SourcesPillProp
         align="start"
         side="top"
         sideOffset={8}
-        className="min-w-[200px] border-border/40 bg-popover/95 shadow-xl backdrop-blur-md"
+        className="min-w-[240px] border-border/40 bg-popover/95 shadow-xl backdrop-blur-md"
       >
         <div className="px-2.5 py-2 text-xs font-medium tracking-wide text-muted-foreground/70">
-          RAG Knowledge Bases
+          Available Capabilities
         </div>
-        {teams.map((team) => (
-          <DropdownMenuItem key={team.teamId} asChild>
-            <a
-              href={team.folderUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(
-                "group/item flex items-center justify-between gap-3",
-                "rounded-lg px-2.5 py-2 text-sm",
-                "transition-colors duration-150",
-                "hover:bg-accent/50 focus:bg-accent/50",
-              )}
+        {tools.map((tool) => {
+          const IconComponent = iconMap[tool.icon] || WrenchIcon;
+          return (
+            <div
+              key={tool.id}
+              className={cn("flex items-start gap-3 px-2.5 py-2.5", "rounded-lg text-sm")}
             >
-              <span className="truncate font-medium">{team.displayName}</span>
-              <ExternalLinkIcon
-                className={cn(
-                  "size-3.5 shrink-0 text-muted-foreground/50",
-                  "opacity-0 transition-all duration-150",
-                  "group-hover/item:opacity-100 group-focus/item:opacity-100",
-                )}
-              />
-            </a>
-          </DropdownMenuItem>
-        ))}
+              <IconComponent className="mt-0.5 size-4 shrink-0 text-muted-foreground/70" />
+              <div className="flex flex-col gap-0.5">
+                <span className="font-medium">{tool.name}</span>
+                <span className="text-xs text-muted-foreground/70">{tool.description}</span>
+              </div>
+            </div>
+          );
+        })}
         <div className="mt-1 border-t border-border/30 px-2.5 py-2 text-[11px] text-muted-foreground/50">
-          Need access? Contact your administrator.
+          Tools are used automatically based on your query.
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

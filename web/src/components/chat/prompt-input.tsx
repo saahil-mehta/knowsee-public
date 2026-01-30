@@ -9,14 +9,26 @@ import {
   type ChangeEvent,
   type ClipboardEvent,
 } from "react";
+import Link from "next/link";
 import { useLocalStorage } from "usehooks-ts";
-import { ArrowUpIcon, PaperclipIcon, Loader2Icon } from "lucide-react";
+import { ArrowUpIcon, PaperclipIcon, Loader2Icon, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { AttachmentList } from "./attachment-preview";
 import { SourcesPill } from "./sources-pill";
+import { ToolsPill } from "./tools-pill";
+import { useGoogleDrive } from "@/hooks/use-google-drive";
 import type { FileAttachment, FileUploadError } from "@/hooks/use-file-upload";
 import { getAcceptString, type UploadConfig } from "@/hooks/use-upload-config";
+import { GoogleDriveIcon } from "@/components/ui/icons";
 
 export type PromptInputProps = {
   onSubmit: (message: string) => void | Promise<void>;
@@ -59,8 +71,36 @@ export function PromptInput({
   // Transient UI state (not persisted)
   const [isComposing, setIsComposing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Track which dropdown is open (mutually exclusive)
+  const [openDropdown, setOpenDropdown] = useState<"attach" | "sources" | "tools" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Google Drive integration
+  const handleDriveFilesSelected = useCallback(
+    (files: File[]) => {
+      if (onAddFiles && files.length > 0) {
+        // Convert File[] to FileList-like object
+        const dataTransfer = new DataTransfer();
+        files.forEach((file) => dataTransfer.items.add(file));
+        onAddFiles(dataTransfer.files);
+        // Show success toast for import
+        toast.success(
+          files.length === 1
+            ? `Imported "${files[0].name}" from Drive`
+            : `Imported ${files.length} files from Drive`,
+        );
+      }
+    },
+    [onAddFiles],
+  );
+
+  const googleDrive = useGoogleDrive({
+    onFilesSelected: handleDriveFilesSelected,
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   // Sync draft to textarea on mount/session change (handles SSR hydration)
   useEffect(() => {
@@ -209,26 +249,68 @@ export function PromptInput({
           {/* Left side - tools */}
           <div className="flex items-center gap-2">
             {showAttachButton && (
-              <button
-                type="button"
-                onClick={openFilePicker}
-                disabled={isBusy || !uploadConfig}
-                className={cn(
-                  "group inline-flex items-center justify-center rounded-full",
-                  "border border-border/60 bg-background/80 backdrop-blur-sm",
-                  "size-8 text-muted-foreground",
-                  "transition-all duration-200 ease-out",
-                  "hover:border-border hover:bg-accent/50 hover:text-foreground",
-                  "focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:outline-none",
-                  "active:scale-[0.98]",
-                  "disabled:pointer-events-none disabled:opacity-40",
-                )}
-                aria-label="Attach files"
-              >
-                <PaperclipIcon className="size-4 transition-transform duration-200 group-hover:rotate-[-15deg]" />
-              </button>
+              <Tooltip>
+                <DropdownMenu
+                  open={openDropdown === "attach"}
+                  onOpenChange={(open) => setOpenDropdown(open ? "attach" : null)}
+                >
+                  <TooltipTrigger asChild>
+                    <DropdownMenuTrigger asChild>
+                      <button
+                        type="button"
+                        disabled={isBusy || !uploadConfig}
+                        className={cn(
+                          "group inline-flex items-center justify-center rounded-full",
+                          "border border-border/60 bg-background/80 backdrop-blur-sm",
+                          "size-8 text-muted-foreground",
+                          "transition-all duration-200 ease-out",
+                          "hover:border-border hover:bg-accent/50 hover:text-foreground",
+                          "focus-visible:outline-none",
+                          "active:scale-[0.96]",
+                          "data-[state=open]:scale-[0.96] data-[state=open]:border-border data-[state=open]:bg-accent/50 data-[state=open]:text-foreground",
+                          "disabled:pointer-events-none disabled:opacity-40",
+                        )}
+                        aria-label="Attach files"
+                      >
+                        <PlusIcon className="size-4 transition-transform duration-200 group-hover:rotate-90 group-data-[state=open]:rotate-90" />
+                      </button>
+                    </DropdownMenuTrigger>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" sideOffset={8}>
+                    Attach files
+                  </TooltipContent>
+                  <DropdownMenuContent
+                    align="start"
+                    side="top"
+                    sideOffset={8}
+                    className="border-border/40 bg-popover/95 shadow-xl backdrop-blur-md"
+                  >
+                    <DropdownMenuItem onClick={openFilePicker}>
+                      <PaperclipIcon className="size-4" />
+                      Upload files
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      onClick={() => googleDrive.openPicker()}
+                      disabled={googleDrive.isLoading}
+                    >
+                      <GoogleDriveIcon className="size-4" />
+                      Add from Drive
+                      {googleDrive.isLoading && (
+                        <Loader2Icon className="ml-auto size-3 animate-spin" />
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </Tooltip>
             )}
-            <SourcesPill />
+            <SourcesPill
+              isOpen={openDropdown === "sources"}
+              onOpenChange={(open) => setOpenDropdown(open ? "sources" : null)}
+            />
+            <ToolsPill
+              isOpen={openDropdown === "tools"}
+              onOpenChange={(open) => setOpenDropdown(open ? "tools" : null)}
+            />
           </div>
 
           {/* Right side - submit */}
@@ -253,6 +335,15 @@ export function PromptInput({
           </button>
         </div>
       </div>
+
+      {/* Disclaimer */}
+      <p className="mt-2 text-center text-xs text-muted-foreground/60 italic">
+        I&apos;m helpful, not infallible. Double-check what matters. Your business stays your
+        business.{" "}
+        <Link href="/privacy" className="underline underline-offset-2 hover:text-muted-foreground">
+          Privacy Policy.
+        </Link>
+      </p>
     </form>
   );
 }

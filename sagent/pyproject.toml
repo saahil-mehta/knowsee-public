@@ -17,6 +17,10 @@ dependencies = [
     "psycopg2-binary>=2.9.0",
     # BigQuery for data analyst agent
     "google-cloud-bigquery>=3.0.0",
+    # File format converters (Office → Markdown)
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "python-pptx>=1.0.0",
     # Dev tooling (always available for make check/fmt)
     "ruff>=0.8.0",
 ]

@@ -1,22 +1,24 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { UserIcon, ShieldIcon, XIcon } from "lucide-react";
+import { UserIcon, ShieldIcon, XIcon, LinkIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { AccountSettings } from "./account-settings";
 import { SecuritySettings } from "./security-settings";
+import { ConnectionsSettings } from "./connections-settings";
 
 interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-type SettingsTab = "account" | "security";
+type SettingsTab = "account" | "security" | "connections";
 
 const tabs: { id: SettingsTab; label: string; icon: React.ElementType }[] = [
   { id: "account", label: "Account", icon: UserIcon },
   { id: "security", label: "Security", icon: ShieldIcon },
+  { id: "connections", label: "Connections", icon: LinkIcon },
 ];
 
 export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
@@ -120,6 +122,7 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
               >
                 {displayedTab === "account" && <AccountSettings />}
                 {displayedTab === "security" && <SecuritySettings />}
+                {displayedTab === "connections" && <ConnectionsSettings />}
               </div>
             </div>
           </div>
